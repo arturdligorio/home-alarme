@@ -2,25 +2,19 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
-
 #include <Adafruit_NeoPixel.h>
-#ifdef __AVR__
- #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
-#endif
+
+#include "./pages.h"
 
 #define ESP12_LED 2
 
-#define LED_PIN     6
-#define LED_COUNT  60
+#define LED_PIN 6
+#define LED_COUNT 60
 #define BRIGHTNESS 50
 
 ESP8266WebServer server(80);
 
-const char *ssid = "DUNET JOAO";
-const char *password = "sonia123";
-
 const char *ssid_c = "ESP8266 Access Point";
-const char *password_c = "10203040";
 
 const char *DNS_WIFI = "espiot";
 
@@ -39,13 +33,28 @@ void piscaLedInterno()
 void startWifiAP()
 {
 
-  WiFi.softAP(ssid_c, password_c);
+  digitalWrite(ESP12_LED, HIGH);
+
+  WiFi.softAP(ssid_c);
   Serial.print("Access Point \"");
   Serial.print(ssid_c);
   Serial.println("\" started");
 
   Serial.print("IP address:\t");
   Serial.println(WiFi.softAPIP());
+
+  piscaLedInterno();
+  piscaLedInterno();
+  piscaLedInterno();
+  piscaLedInterno();
+  
+  if (MDNS.begin(DNS_WIFI))
+  {
+    Serial.print("DNS na rede com o nome de:\t");
+    Serial.println(DNS_WIFI);
+  }
+
+  MDNS.addService("http", "tcp", 80);
 }
 
 boolean connectWiFI(String ssid, String password)
@@ -60,7 +69,7 @@ boolean connectWiFI(String ssid, String password)
     Serial.print("*");
     timeOut += 1;
 
-    if (timeOut >= 50)
+    if (timeOut >= 30)
     {
       Serial.println("\nTimeOut para conexão WIFI.");
 
@@ -92,8 +101,36 @@ boolean connectWiFI(String ssid, String password)
 
 void handleRoot()
 {
+  server.send(200, "text/html", "<h1>Funcionou</h1>");
+}
 
-  server.send(200, "text/plain", "hello from esp8266!");
+void configWifi()
+{
+
+  String s = WIFI_CONNECT_PAGE;
+  server.send(200, "text/html", s);
+}
+
+void connectWifiHandle(){
+
+  String ssid_connect = server.arg("ssid_wifi");
+  String password_connect = server.arg("pass_wifi");
+  String menssagem = "";
+
+  if (connectWiFI(ssid_connect, password_connect))
+  {
+    IPAddress ip = WiFi.localIP();
+    String ipString = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
+    menssagem = ipString;
+
+  }else{
+
+    menssagem = "0.0.0.0";
+  }
+  
+  Serial.println(menssagem);
+  server.send(200, "text/plain", menssagem);
+
 }
 
 void handleNotFound()
@@ -116,15 +153,22 @@ void handleNotFound()
 
 void setup()
 {
+  // if(SPIFFS.begin() ? Serial.println("SPIFFS Initialize....ok") : Serial.println("SPIFFS Initialization...failed"));
+
+  // if(SPIFFS.format() ? Serial.println("File System Formated") : Serial.println("File System Formatting Error"));
 
   pinMode(ESP12_LED, OUTPUT);
 
   Serial.begin(9600);
   Serial.println();
 
-  connectWiFI(ssid, password);
+  //connectWiFI(ssid, password);
 
-  server.on("/", handleRoot);
+  startWifiAP();
+
+  server.on("/wifi", configWifi);
+
+  server.on("/config/wifi", connectWifiHandle);
 
   server.on("/inline", []() {
     server.send(200, "text/plain", "<h1>this works as well</h1>");

@@ -1,3 +1,4 @@
+const char WIFI_CONNECT_PAGE[] = R"=====(
 <head>
     <meta charset="UTF-8">
     <title>Config WIFI</title>
@@ -46,3 +47,4 @@
     <b>PASS:</b><input name="pass_wifi" id="pass" type="password" placeholder="Password" required><br />
     <button onclick="updateWifi(form)">Conectar</button>
 </form>
+)=====";

@@ -1,0 +1,37 @@
+<head>
+    <meta charset="UTF-8">
+
+    <title>Config WIFI</title>
+    <style>
+        button {
+            background-color: #158e15b3;
+            height: 35px;
+            width: 15%;
+            border-radius: 10px;
+            margin-top: 1%;
+        }
+        
+        h1 {
+            font-family: Arial;
+            padding-top: 10%;
+            font-size: 140%;
+        }
+        
+        input {
+            border-radius: 3px;
+            padding-left: 1%;
+            margin-left: 2%;
+            margin-top: 1%;
+            width: 15%;
+            background-color: #e2e2e2;
+        }
+    </style>
+</head>
+<form style="text-align: center;" method="POST" action="/connectWifi">
+
+    <h1>Configuração do WIFI</h1>
+    <b>SSID:</b><input name="ssid_wifi" placeholder="SSID" required><br />
+    <b>PASS:</b><input name="pass_wifi" type="password" placeholder="Password" required><br />
+    <button type="submit">Conectar</button>
+
+</form>
