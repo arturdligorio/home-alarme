@@ -27,16 +27,23 @@ const char WIFI_CONNECT_PAGE[] = R"=====(
         }
     </style>
     <script>
+        function reqListener() {
+
+            var resp = this.responseText;
+            if (resp == "0.0.0.0" ? alert("Wifi não CONECTADO") : alert("Wifi conectado com o IP: " + resp));
+
+        }
+
         function updateWifi(formSub) {
             var xhr = new XMLHttpRequest();
             var ssid = document.getElementById("ssid").value;
             var pass = document.getElementById("pass").value;
 
-            if (ssid != "" || pass != "") {
-                xhr.open("POST", "/config/wifi", false);
+            if (ssid != "" && pass != "") {
+
+                xhr.addEventListener("load", reqListener);
+                xhr.open("POST", "/config/wifi");
                 xhr.send(new FormData(formSub));
-                var resp = xhr.responseText;
-                if (resp == "0.0.0.0" ? alert("Wifi não CONECTADO") : alert("Wifi conectado com o IP: " + resp));
             }
         }
     </script>

@@ -47,14 +47,6 @@ void startWifiAP()
   piscaLedInterno();
   piscaLedInterno();
   piscaLedInterno();
-  
-  if (MDNS.begin(DNS_WIFI))
-  {
-    Serial.print("DNS na rede com o nome de:\t");
-    Serial.println(DNS_WIFI);
-  }
-
-  MDNS.addService("http", "tcp", 80);
 }
 
 boolean connectWiFI(String ssid, String password)
@@ -69,7 +61,7 @@ boolean connectWiFI(String ssid, String password)
     Serial.print("*");
     timeOut += 1;
 
-    if (timeOut >= 30)
+    if (timeOut >= 40)
     {
       Serial.println("\nTimeOut para conexão WIFI.");
 
@@ -88,17 +80,9 @@ boolean connectWiFI(String ssid, String password)
   Serial.println("WiFi connection Successful");
   Serial.print("The IP Address of ESP8266 Module is: ");
   Serial.println(WiFi.localIP());
-
-  if (MDNS.begin(DNS_WIFI))
-  {
-    Serial.print("DNS na rede com o nome de:\t");
-    Serial.println(DNS_WIFI);
-  }
-
-  MDNS.addService("http", "tcp", 80);
   return true;
 }
-
+  
 void handleRoot()
 {
   server.send(200, "text/html", "<h1>Funcionou</h1>");
@@ -180,7 +164,6 @@ void setup()
 
 void loop()
 {
-  MDNS.update();
   server.handleClient();
 
   delay(1000);
