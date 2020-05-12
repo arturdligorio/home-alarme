@@ -189,15 +189,6 @@ const char WIFI_CONNECT_PAGE[] = R"=====(
         </div>
     </section>
 </body>
-<!-- <div id="formWifi" style="text-align: center;">
-    <h1>Configuração do WIFI</h1>
-    <b>SSID:</b><input name="ssid_wifi" id="ssid" placeholder="SSID" required><br />
-    <b>PASS:</b><input name="pass_wifi" id="pass" type="password" placeholder="Password" required><br />
-    <button onclick="updateWifi()">Conectar</button><br /><br />
-
-    <div id="resposta_wifi"></div>
-</div> -->
-
 </html>
 )=====";
 

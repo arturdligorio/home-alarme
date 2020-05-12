@@ -8,18 +8,29 @@
 #include <avr/power.h>
 #endif
 
+#include <SoftwareSerial.h>
+#include <DFRobotDFPlayerMini.h>
+
 #include "./pages.h"
 
 #define ESP12_LED 2
 
 #define SENSOR_PIN 10
 
+#define DFPLAYER_RX 5
+#define DFPLAYER_TX 16
+
 #define LED_PIN 4
 #define LED_COUNT 30
 
-#define DELAYVAL 500
+#define COR_AMARELA 250, 244, 72
+#define COR_VERDE 0, 155, 0
+#define COR_VERMELHA 155, 0, 0
 
 Adafruit_NeoPixel pixels(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+SoftwareSerial mySoftwareSerial(5, 16); // RX, TX
+DFRobotDFPlayerMini myDFPlayer;
 
 ESP8266WebServer server(80);
 
@@ -33,6 +44,20 @@ boolean timeOutNewConnectionWifi = true;
 String stateConnectWifi = "desconectado";
 
 boolean sensorMovimento = false;
+
+void inicializaDFPlayer()
+{
+
+  mySoftwareSerial.begin(9600);
+  myDFPlayer.begin(mySoftwareSerial);
+  myDFPlayer.setTimeOut(500);
+  myDFPlayer.volume(30);
+  myDFPlayer.EQ(0);
+}
+
+int getNumberMuisicDFPlayer(){
+  return myDFPlayer.readFileCounts(DFPLAYER_DEVICE_SD);
+}
 
 void iniciaComponentes()
 {
@@ -71,6 +96,8 @@ void connectWiFI(String ssid, String password)
   boolean conectou = true;
   int timeOut = 0;
 
+  WiFi.disconnect(true);
+  delay(200);
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED)
@@ -183,7 +210,7 @@ void handleNotFound()
   server.send(404, "text/plain", message);
 }
 
-void ascendeLed(int r, int g, int b)
+void ascendeLedByColor(int r, int g, int b)
 {
   int i = LED_COUNT;
   for (i = 0; i < LED_COUNT; i++)
@@ -193,33 +220,46 @@ void ascendeLed(int r, int g, int b)
   }
 }
 
+void piscaLedInicio()
+{
+
+  //cor amarela
+  ascendeLedByColor(COR_AMARELA);
+  pixels.clear();
+  ascendeLedByColor(250, 244, 72);
+  pixels.clear();
+  ascendeLedByColor(250, 244, 72);
+  pixels.clear();
+}
+
 void leSensorMovimento()
 {
   int acionamento = digitalRead(SENSOR_PIN);
   if (acionamento == LOW)
   {
-    ascendeLed(0, 155, 0);
+    ascendeLedByColor(COR_VERDE);
   }
   else
   {
     sensorMovimento = true;
-    ascendeLed(155, 0, 0);
+    ascendeLedByColor(COR_VERMELHA);
   }
 }
 
 void setup()
 {
-  
+
   pinMode(ESP12_LED, OUTPUT);
   pinMode(SENSOR_PIN, INPUT);
 
-  #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
-    clock_prescale_set(clock_div_1);
-  #endif
-
+#if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
+  clock_prescale_set(clock_div_1);
+#endif
+  inicializaDFPlayer();
   Serial.begin(9600);
   Serial.println();
 
+  WiFi.disconnect(true);
   startWifiAP();
 
   server.on("/wifi", pageConfigWifi);
@@ -235,7 +275,7 @@ void setup()
   server.begin();
   pixels.begin();
 
-  ascendeLed(0, 155, 0);
+  ascendeLedByColor(COR_AMARELA);
 }
 
 void loop()
