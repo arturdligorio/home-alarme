@@ -1,7 +1,8 @@
+<html>
+
 <head>
     <meta charset="UTF-8">
-
-    <title>Config WIFI</title>
+    <title>HOME</title>
     <style>
         button {
             background-color: #158e15b3;
@@ -26,12 +27,41 @@
             background-color: #e2e2e2;
         }
     </style>
+    <script>
+        function updateWifi() {
+            var xhr = new XMLHttpRequest();
+            var formData = new FormData();
+            var ssid = document.getElementById("ssid").value;
+            var pass = document.getElementById("pass").value;
+
+            formData.append("ssid_wifi", ssid);
+            formData.append("pass_wifi", pass);
+
+            if (ssid == "" || pass == "") {
+
+                alert("Existem campos vazios !!");
+
+            } else {
+
+                xhr.open("POST", "/config/wifi");
+                xhr.send(formData);
+
+                document.getElementById("resposta_wifi").innerHTML = "Conectando... Aguarde !!";
+                getStateWifi();
+            }
+        }
+    </script>
 </head>
-<form style="text-align: center;" method="POST" action="/connectWifi">
 
-    <h1>Configuração do WIFI</h1>
-    <b>SSID:</b><input name="ssid_wifi" placeholder="SSID" required><br />
-    <b>PASS:</b><input name="pass_wifi" type="password" placeholder="Password" required><br />
-    <button type="submit">Conectar</button>
+<body>
+    <div style="text-align: center;">
 
-</form>
+        <button></button>
+        <button></button>
+        <button></button>
+
+    </div>
+
+</body>
+
+</html>

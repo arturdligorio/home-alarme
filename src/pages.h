@@ -1,4 +1,6 @@
 const char WIFI_CONNECT_PAGE[] = R"=====(
+<html>
+
 <head>
     <meta charset="UTF-8">
     <title>Config WIFI</title>
@@ -27,31 +29,76 @@ const char WIFI_CONNECT_PAGE[] = R"=====(
         }
     </style>
     <script>
-        function reqListener() {
-
-            var resp = this.responseText;
-            if (resp == "0.0.0.0" ? alert("Wifi não CONECTADO") : alert("Wifi conectado com o IP: " + resp));
-
+        function wait(ms) {
+            var start = new Date().getTime();
+            var end = start;
+            while (end < start + ms) {
+                end = new Date().getTime();
+            }
         }
 
-        function updateWifi(formSub) {
+        function getStateWifi() {
+
             var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/status/wifi/state", false);
+            xhr.send();
+
+            if (xhr.responseText == "desconectado") {
+                wait(1000);
+                getStateWifi();
+            } else if (xhr.responseText == "conectando") {
+                document.getElementById("resposta_wifi").innerHTML = "Conectando ao wifi...";
+                wait(1000);
+                getStateWifi();
+            } else if (xhr.responseText == "timeout") {
+                document.getElementById("resposta_wifi").innerHTML = "Erro ao conectar ao wifi...";
+                document.getElementById("ssid").innerHTML = "";
+                document.getElementById("pass").innerHTML = "";
+            } else {
+                document.getElementById("resposta_wifi").innerHTML = "Conectado com o IP: " + xhr.responseText;
+                document.getElementById("ssid").innerHTML = "";
+                document.getElementById("pass").innerHTML = "";
+            }
+        }
+
+        function updateWifi() {
+            var xhr = new XMLHttpRequest();
+            var formData = new FormData();
             var ssid = document.getElementById("ssid").value;
             var pass = document.getElementById("pass").value;
 
-            if (ssid != "" && pass != "") {
+            formData.append("ssid_wifi", ssid);
+            formData.append("pass_wifi", pass);
 
-                xhr.addEventListener("load", reqListener);
+            if (ssid == "" || pass == "") {
+
+                alert("Existem campos vazios !!");
+
+            } else {
+
                 xhr.open("POST", "/config/wifi");
-                xhr.send(new FormData(formSub));
+                xhr.send(formData);
+
+                document.getElementById("resposta_wifi").innerHTML = "Conectando... Aguarde !!";
+                getStateWifi();
             }
         }
     </script>
 </head>
-<form id="formWifi" style="text-align: center;" method="POST">
+<div id="formWifi" style="text-align: center;">
     <h1>Configuração do WIFI</h1>
     <b>SSID:</b><input name="ssid_wifi" id="ssid" placeholder="SSID" required><br />
     <b>PASS:</b><input name="pass_wifi" id="pass" type="password" placeholder="Password" required><br />
-    <button onclick="updateWifi(form)">Conectar</button>
-</form>
+    <button onclick="updateWifi()">Conectar</button><br /><br />
+
+    <div id="resposta_wifi"></div>
+</div>
+
+</html>
+)=====";
+
+const char WIFI_STATUS_PAGE[] = R"=====(
+    
+    WEDFWEFW
+
 )=====";
