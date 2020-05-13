@@ -16,6 +16,7 @@
             width: 15%;
             border-radius: 10px;
             margin-top: 1%;
+            cursor: pointer;
         }
         
         input {
@@ -44,6 +45,7 @@
         .wifi-card {
             /* width: 25vw;
             height: 45vh; */
+            position: relative;
             width: 500px;
             height: 350px;
             border-radius: 25px;
@@ -155,6 +157,39 @@
             padding: 15px 15px;
             text-align: center;
             font-weight: 600;
+        }
+        .go-home-btn {
+            background-color: #fdfcfc;
+            border: 0;
+            /* width: 110px; */
+            /* height: 110px; */
+            border-radius: 12.5px;
+            position: absolute;
+            height: fit-content;
+            width: fit-content;
+            padding: 10px 20px;
+            right: -150px;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.07), 0 4px 8px rgba(0, 0, 0, 0.07), 0 8px 16px rgba(0, 0, 0, 0.07), 0 16px 32px rgba(0, 0, 0, 0.07), 0 32px 64px rgba(0, 0, 0, 0.07);
+        }
+        .go-home-btn:hover{
+            background-color: #f3f0f0;
+        }
+
+        .go-home-btn svg {
+            width: 30px;
+            /* height: 60px; */
+            display: block;
+            margin: 0 auto;
+        }
+
+        .go-home-btn p {
+            font-size: 1.4em;
+            line-height: 1.4em;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #5f7c95;
         }
     </style>
     <script>
@@ -279,6 +314,16 @@
                     </div>
                     <button class="submit-btn" onclick="updateWifi()">Conectar</button>
                 </div>
+                <button class="go-home-btn">
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <svg enable-background="new 0 0 512 512" version="1.1" viewBox="0 0 512 512" xml:space="preserve"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <polygon points="256 0 20.024 168.78 20.024 207.18 256 38.4 491.98 207.18 491.98 168.78"
+                            fill="#E04F5F" />
+                        <polygon points="59.528 512 59.528 212.4 256 70.912 452.47 212.4 452.47 512" fill="#5F7D95" />
+                    </svg>
+                    <p>HOME</p>
+                </button>
             </div>
             <div class="wrapper-wifi-answer">
                 <div id="resposta_wifi"></div>
