@@ -42,6 +42,7 @@ const char *DNS_WIFI = "espiot";
 boolean connectedNewWifi = false;
 boolean timeOutNewConnectionWifi = true;
 String stateConnectWifi = "desconectado";
+boolean sistemaAutonoLigado = false;
 
 boolean sensorMovimento = false;
 
@@ -55,7 +56,8 @@ void inicializaDFPlayer()
   myDFPlayer.EQ(0);
 }
 
-int getNumberMuisicDFPlayer(){
+int getNumberMuisicDFPlayer()
+{
   return myDFPlayer.readFileCounts(DFPLAYER_DEVICE_SD);
 }
 
@@ -133,26 +135,19 @@ void connectWiFI(String ssid, String password)
   }
 }
 
-void handleRoot()
+void handlePageHome()
 {
   server.send(200, "text/html", "<h1>Funcionou</h1>");
 }
 
-void pageConfigWifi()
+void handlePageConfigWifi()
 {
 
   String s = WIFI_CONNECT_PAGE;
   server.send(200, "text/html", s);
 }
 
-void pageStatusWifi()
-{
-
-  String s = WIFI_STATUS_PAGE;
-  server.send(200, "text/html", s);
-}
-
-void connectWifiHandle()
+void handleConnectWifi()
 {
 
   String ssid_connect = server.arg("ssid_wifi");
@@ -225,24 +220,37 @@ void piscaLedInicio()
 
   //cor amarela
   ascendeLedByColor(COR_AMARELA);
+  delay(250);
   pixels.clear();
-  ascendeLedByColor(250, 244, 72);
+  delay(250);
+  ascendeLedByColor(COR_AMARELA);
+  delay(250);
   pixels.clear();
-  ascendeLedByColor(250, 244, 72);
+  delay(250);
+  ascendeLedByColor(COR_AMARELA);
+  delay(250);
   pixels.clear();
+  delay(250);
 }
 
 void leSensorMovimento()
 {
-  int acionamento = digitalRead(SENSOR_PIN);
-  if (acionamento == LOW)
+  if (sistemaAutonoLigado)
   {
-    ascendeLedByColor(COR_VERDE);
-  }
-  else
-  {
-    sensorMovimento = true;
-    ascendeLedByColor(COR_VERMELHA);
+    int acionamento = digitalRead(SENSOR_PIN);
+    if (acionamento == LOW)
+    {
+      ascendeLedByColor(COR_VERDE);
+    }
+    else
+    {
+      sensorMovimento = true;
+      ascendeLedByColor(COR_VERMELHA);
+    }
+  }else{
+
+    //TODO: definir sistema desligado
+
   }
 }
 
@@ -262,9 +270,8 @@ void setup()
   WiFi.disconnect(true);
   startWifiAP();
 
-  server.on("/wifi", pageConfigWifi);
-  server.on("/config/wifi", HTTP_POST, connectWifiHandle);
-  server.on("/status/wifi", HTTP_GET, pageStatusWifi);
+  server.on("/wifi", handlePageConfigWifi);
+  server.on("/config/wifi", HTTP_POST, handleConnectWifi);
   server.on("/status/wifi/state", HTTP_GET, handleStatusConnectWifi);
 
   server.on("/inline", []() {
