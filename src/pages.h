@@ -17,6 +17,7 @@ const char WIFI_CONNECT_PAGE[] = R"=====(
             width: 15%;
             border-radius: 10px;
             margin-top: 1%;
+            cursor: pointer;
         }
         
         input {
@@ -45,6 +46,7 @@ const char WIFI_CONNECT_PAGE[] = R"=====(
         .wifi-card {
             /* width: 25vw;
             height: 45vh; */
+            position: relative;
             width: 500px;
             height: 350px;
             border-radius: 25px;
@@ -156,6 +158,41 @@ const char WIFI_CONNECT_PAGE[] = R"=====(
             padding: 15px 15px;
             text-align: center;
             font-weight: 600;
+        }
+        
+        .go-home-btn {
+            background-color: #fdfcfc;
+            border: 0;
+            /* width: 110px; */
+            /* height: 110px; */
+            border-radius: 12.5px;
+            position: absolute;
+            height: fit-content;
+            width: fit-content;
+            padding: 10px 20px;
+            right: -150px;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.07), 0 4px 8px rgba(0, 0, 0, 0.07), 0 8px 16px rgba(0, 0, 0, 0.07), 0 16px 32px rgba(0, 0, 0, 0.07), 0 32px 64px rgba(0, 0, 0, 0.07);
+        }
+        
+        .go-home-btn:hover {
+            background-color: #f3f0f0;
+        }
+        
+        .go-home-btn svg {
+            width: 30px;
+            /* height: 60px; */
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .go-home-btn p {
+            font-size: 1.4em;
+            line-height: 1.4em;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #5f7c95;
         }
     </style>
     <script>
@@ -280,6 +317,16 @@ const char WIFI_CONNECT_PAGE[] = R"=====(
                     </div>
                     <button class="submit-btn" onclick="updateWifi()">Conectar</button>
                 </div>
+                <button class="go-home-btn" onclick="window.location.href = window.location.origin + '/home'">
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <svg enable-background="new 0 0 512 512" version="1.1" viewBox="0 0 512 512" xml:space="preserve"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <polygon points="256 0 20.024 168.78 20.024 207.18 256 38.4 491.98 207.18 491.98 168.78"
+                            fill="#E04F5F" />
+                        <polygon points="59.528 512 59.528 212.4 256 70.912 452.47 212.4 452.47 512" fill="#5F7D95" />
+                    </svg>
+                    <p>HOME</p>
+                </button>
             </div>
             <div class="wrapper-wifi-answer">
                 <div id="resposta_wifi"></div>
@@ -291,8 +338,216 @@ const char WIFI_CONNECT_PAGE[] = R"=====(
 </html>
 )=====";
 
-const char WIFI_STATUS_PAGE[] = R"=====(
-    
-    WEDFWEFW
+const char MOVIMENTO_MONITORING_PAGE[] = R"=====(    
+<html>
 
+<head>
+    <meta charset="UTF-8">
+    <title>MONITOR</title>
+    <style>
+        * {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        button {
+            background-color: #158e15b3;
+            height: 35px;
+            width: 15%;
+            border-radius: 10px;
+            margin-top: 1%;
+        }
+        
+        input {
+            border-radius: 3px;
+            padding-left: 1%;
+            margin-left: 2%;
+            margin-top: 1%;
+            width: 15%;
+            background-color: #e2e2e2;
+        }
+        
+        section {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .container-all {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: center;
+            align-items: center;
+            padding: 50px 50px;
+        }
+        
+        .flex {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .header {
+            flex: 0 0 100%;
+            font-weight: 600;
+            font-size: 30px;
+            font-style: italic;
+        }
+        
+        .sending-request {
+            flex: 0 0 100%;
+            font-weight: 500;
+            font-size: 18px;
+            padding: 50px 50px;
+        }
+        
+        .event-list {
+            list-style: none;
+        }
+        
+        .events {
+            align-items: flex-start;
+            height: 60vh;
+            overflow-y: auto;
+        }
+        
+        .event-list li {
+            background-color: black;
+            padding: 10px 10px;
+            margin-bottom: 20px;
+            color: #fff;
+            font-size: 15px;
+            border-radius: 5px;
+            width: 400px;
+            height: 30px;
+            animation: opacityTransition .4s;
+            position: relative;
+            transition: all .3s;
+            display: flex;
+            flex-flow: row wrap;
+            align-content: center;
+            box-shadow: 2px 1px 7px 2px gray;
+            font-weight: 600;
+        }
+        
+        @keyframes opacityTransition {
+            from {
+                opacity: 0;
+            }
+            ;
+            to {
+                opacity: 1;
+            }
+            ;
+        }
+        
+        .transition {
+            animation: opacityTransition 1.5s;
+        }
+        
+        .scroll1::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .scroll1::-webkit-scrollbar-thumb {
+            background: #666;
+            border-radius: 20px;
+        }
+        
+        .scroll1::-webkit-scrollbar-track {
+            background: #ddd;
+            border-radius: 10px;
+        }
+    </style>
+    <script>
+        function formatDate(d) {
+
+            var day = new String(d.getDate());
+            var month = new String(d.getMonth() + 1);
+            var hours = new String(d.getHours());
+            var minutes = new String(d.getMinutes());
+            var seconds = new String(d.getSeconds());
+
+            if (day.length == 1)
+                day = "0" + day;
+
+            if (month.length == 1)
+                month = "0" + month;
+
+            if (hours.length == 1)
+                hours = "0" + hours;
+
+            if (minutes.length == 1)
+                minutes = "0" + minutes;
+
+            if (seconds.length == 1)
+                seconds = "0" + seconds;
+
+            dformat = [month,
+                day,
+                d.getFullYear()
+            ].join('/') + ' ' + [hours,
+                minutes,
+                seconds
+            ].join(':');
+            return dformat;
+        }
+
+        function sendRequest() {
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/state/movimento", false);
+            xhr.send();
+            var resp = xhr.responseText;
+
+            if (resp == "true") {
+                const list = document.getElementById('events-list');
+                const item = document.createElement('li');
+                item.appendChild(document.createTextNode(`Evento: Movimento detectado - ${formatDate(new Date())}`));
+                list.appendChild(item);
+            }
+        }
+
+        function alternateTextOpacity() {
+            let apply = true;
+            return function() {
+                console.log("applying " + apply);
+                const sendingRequestText = document.getElementById('sending-request');
+                if (apply) {
+                    sendingRequestText.classList.add('transition');
+                } else {
+                    sendingRequestText.classList.remove('transition');
+                }
+                apply = !apply;
+            }
+        }
+        const alternateText = alternateTextOpacity();
+        setInterval(() => {
+            alternateText();
+        }, 1000);
+        setInterval(() => {
+            sendRequest();
+        }, 1200);
+    </script>
+</head>
+
+<body>
+    <section>
+        <div class="container-all">
+            <div class="header flex">
+                <h3>Monitor de Eventos</h3>
+            </div>
+            <div class="sending-request flex" id="sending-request">
+                <p>Coletando informações de eventos ...</p>
+            </div>
+            <div class="events scroll1 flex">
+                <ul class="event-list" id="events-list">
+                </ul>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>
 )=====";

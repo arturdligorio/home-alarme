@@ -23,9 +23,10 @@
 #define LED_PIN 4
 #define LED_COUNT 30
 
-#define COR_AMARELA 250, 244, 72
+#define COR_AMARELA 155, 155, 0
 #define COR_VERDE 0, 155, 0
 #define COR_VERMELHA 155, 0, 0
+#define COR_LARANJA 155, 70, 0
 
 Adafruit_NeoPixel pixels(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -42,7 +43,7 @@ const char *DNS_WIFI = "espiot";
 boolean connectedNewWifi = false;
 boolean timeOutNewConnectionWifi = true;
 String stateConnectWifi = "desconectado";
-boolean sistemaAutonoLigado = false;
+boolean sistemaAutonoLigado = true;
 
 boolean sensorMovimento = false;
 
@@ -71,6 +72,34 @@ void piscaLedInterno()
   delay(200);
   digitalWrite(ESP12_LED, HIGH);
   delay(200);
+}
+
+void ascendeLedByColor(int r, int g, int b)
+{
+  int i = LED_COUNT;
+  for (i = 0; i < LED_COUNT; i++)
+  {
+    pixels.setPixelColor(i, pixels.Color(r, g, b));
+    pixels.show();
+  }
+}
+
+void piscaLedInicio()
+{
+
+  //cor amarela
+  ascendeLedByColor(COR_AMARELA);
+  delay(250);
+  pixels.clear();
+  delay(250);
+  ascendeLedByColor(COR_AMARELA);
+  delay(250);
+  pixels.clear();
+  delay(250);
+  ascendeLedByColor(COR_AMARELA);
+  delay(250);
+  pixels.clear();
+  delay(250);
 }
 
 void startWifiAP()
@@ -137,7 +166,9 @@ void connectWiFI(String ssid, String password)
 
 void handlePageHome()
 {
-  server.send(200, "text/html", "<h1>Funcionou</h1>");
+  String s = MOVIMENTO_MONITORING_PAGE;
+
+  server.send(200, "text/html", s);
 }
 
 void handlePageConfigWifi()
@@ -161,7 +192,7 @@ void handleConnectWifi()
 
 void handleStatusConnectWifi()
 {
-  String menssagem = "";
+  String mensagem = "";
   String ipString = "0.0.0.0";
 
   if (WiFi.status() == WL_CONNECTED)
@@ -175,16 +206,29 @@ void handleStatusConnectWifi()
   if (timeOutNewConnectionWifi && !connectedNewWifi && stateConnectWifi != "conectado")
   {
 
-    menssagem = stateConnectWifi;
-    Serial.println(menssagem);
-    server.send(200, "text/plain", menssagem);
+    mensagem = stateConnectWifi;
+    Serial.println(mensagem);
+    server.send(200, "text/plain", mensagem);
   }
   else if (connectedNewWifi && stateConnectWifi == "conectado")
   {
-    menssagem = ipString;
-    Serial.println(menssagem);
-    server.send(200, "text/plain", menssagem);
+    mensagem = ipString;
+    Serial.println(mensagem);
+    server.send(200, "text/plain", mensagem);
   }
+}
+
+void handleStateMovimento(){
+
+  String mensagem = "false";
+
+  if (sensorMovimento)
+  {
+    mensagem = "true";
+  }
+
+  server.send(200, "text/plain", mensagem);
+
 }
 
 void handleNotFound()
@@ -205,34 +249,6 @@ void handleNotFound()
   server.send(404, "text/plain", message);
 }
 
-void ascendeLedByColor(int r, int g, int b)
-{
-  int i = LED_COUNT;
-  for (i = 0; i < LED_COUNT; i++)
-  {
-    pixels.setPixelColor(i, pixels.Color(r, g, b));
-    pixels.show();
-  }
-}
-
-void piscaLedInicio()
-{
-
-  //cor amarela
-  ascendeLedByColor(COR_AMARELA);
-  delay(250);
-  pixels.clear();
-  delay(250);
-  ascendeLedByColor(COR_AMARELA);
-  delay(250);
-  pixels.clear();
-  delay(250);
-  ascendeLedByColor(COR_AMARELA);
-  delay(250);
-  pixels.clear();
-  delay(250);
-}
-
 void leSensorMovimento()
 {
   if (sistemaAutonoLigado)
@@ -240,6 +256,7 @@ void leSensorMovimento()
     int acionamento = digitalRead(SENSOR_PIN);
     if (acionamento == LOW)
     {
+      sensorMovimento = false;
       ascendeLedByColor(COR_VERDE);
     }
     else
@@ -249,8 +266,8 @@ void leSensorMovimento()
     }
   }else{
 
-    //TODO: definir sistema desligado
-
+    sensorMovimento = false;
+    ascendeLedByColor(COR_LARANJA);
   }
 }
 
@@ -271,12 +288,10 @@ void setup()
   startWifiAP();
 
   server.on("/wifi", handlePageConfigWifi);
+  server.on("/home", HTTP_GET, handlePageHome);
   server.on("/config/wifi", HTTP_POST, handleConnectWifi);
   server.on("/status/wifi/state", HTTP_GET, handleStatusConnectWifi);
-
-  server.on("/inline", []() {
-    server.send(200, "text/html", "<center><h1>BEM VINDO !!</h1></center>");
-  });
+  server.on("/state/movimento", HTTP_GET, handleStateMovimento);
 
   server.onNotFound(handleNotFound);
   server.begin();
