@@ -551,3 +551,9 @@ const char MOVIMENTO_MONITORING_PAGE[] = R"=====(
 
 </html>
 )=====";
+
+const char HOME_PAGE[] = R"=====(
+
+<h1>HOME PAGE</h1>
+
+)=====";

@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-#include <ESP8266mDNS.h>
+#include <ESP8266HTTPClient.h>
 
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
@@ -28,12 +28,26 @@
 #define COR_VERMELHA 155, 0, 0
 #define COR_LARANJA 155, 70, 0
 
+#define SMTP_PORT 2525
+#define SMTP_SERVER "mail.smtp2go.com"
+#define SMTP_USER "home.alarme.iot@gmail.com"
+#define SMTP_PASS "homeiot1020"
+
+#define TRIGGER_IFTTT "alarme_disparado"
+#define KEY_IFTTT "i0PQ4IxUb9hQPgfonA9YcXN-DcMwDdhFnJTY2tLMbKH"
+#define HOST_IFTTT "maker.ifttt.com"
+#define PORT_IFTTT 443
+#define FINGERPRINTS_IFTTT "AA 75 CB 41 2E D5 F9 97 FF 5D A0 8B 7D AC 12 21 08 4B 00 8C"
+
 Adafruit_NeoPixel pixels(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 SoftwareSerial mySoftwareSerial(5, 16); // RX, TX
 DFRobotDFPlayerMini myDFPlayer;
 
 ESP8266WebServer server(80);
+HTTPClient http;
+
+//WiFiClientSecure client;
 
 const char *ssid_c = "ESP8266 AP";
 const char *pass_c = "10203040";
@@ -102,6 +116,82 @@ void piscaLedInicio()
   delay(250);
 }
 
+String sendNotifyIFTTTReq(){
+
+  String response = "error";
+
+  if ((WiFi.status() == WL_CONNECTED)) {
+ 
+    http.begin("https://maker.ifttt.com/trigger/alarme_disparado/with/key/i0PQ4IxUb9hQPgfonA9YcXN-DcMwDdhFnJTY2tLMbKH", FINGERPRINTS_IFTTT); 
+    int httpCode = http.GET(); 
+ 
+    if (httpCode > 0) {
+ 
+        response = http.getString();
+        Serial.println(httpCode);
+        Serial.println(response);
+
+        return response;
+      }
+ 
+    else {
+      Serial.println("Error on HTTP request");
+    }
+ 
+    http.end(); 
+  }
+
+  return response;
+
+}
+
+void sendNotifyIFTTT()
+{  
+  // client.setFingerprint(FINGERPRINTS_IFTTT);
+  // client.setTimeout(15000);
+
+  // int r=0;
+  // while((!client.connect(HOST_IFTTT, PORT_IFTTT)) && (r < 100)){
+  //     delay(100);
+  //     Serial.print(".");
+  //     r++;
+  // }
+
+  // if (r < 100)
+  // {
+  //   Serial.println("Conectou ao IFTTT");
+
+  //   String url = String("GET ") + "/trigger/";
+  //   url = url + TRIGGER_IFTTT;
+  //   url = url + "/with/key/";
+  //   url = url + KEY_IFTTT;
+
+  //   client.println(url);
+
+  //   unsigned long timeout = millis();
+  //   while (client.available() == 0)
+  //   {
+  //     if (millis() - timeout > 5000)
+  //     {
+  //       Serial.println(">>> Client Timeout !");
+  //       client.stop();
+  //       return;
+  //     }
+  //   } // Read all the lines of the reply from server and print them to Serial
+  //   while (client.available())
+  //   {
+  //     String line = client.readStringUntil('\r');
+  //     Serial.print(line);
+  //   }
+  //   Serial.println();
+  //   Serial.println("closing connection");
+  // }else{
+
+  //   Serial.println("Não conectado ao IFTTT!!!");
+
+  // }
+}
+
 void startWifiAP()
 {
 
@@ -166,16 +256,12 @@ void connectWiFI(String ssid, String password)
 
 void handlePageHome()
 {
-  String s = MOVIMENTO_MONITORING_PAGE;
-
-  server.send(200, "text/html", s);
+  server.send(200, "text/html", String(HOME_PAGE));
 }
 
 void handlePageConfigWifi()
 {
-
-  String s = WIFI_CONNECT_PAGE;
-  server.send(200, "text/html", s);
+  server.send(200, "text/html", String(WIFI_CONNECT_PAGE));
 }
 
 void handleConnectWifi()
@@ -218,34 +304,39 @@ void handleStatusConnectWifi()
   }
 }
 
-void handleStateMovimento(){
-
-  String mensagem = "false";
-
+void handleStateMovimento()
+{
   if (sensorMovimento)
-  {
-    mensagem = "true";
-  }
+    server.send(200, "text/plain", "true");
+  else
+    server.send(200, "text/plain", "false");
+}
 
-  server.send(200, "text/plain", mensagem);
+void handlePageMonitor()
+{
+  server.send(200, "text/html", String(MOVIMENTO_MONITORING_PAGE));
+}
 
+void handleSendNotyfi(){
+
+  String resp = sendNotifyIFTTTReq();
+
+  server.send(200, "text/html", resp);
+
+}
+
+void handleSendEmail()
+{
+  sendNotifyIFTTT();
+
+  server.send(200, "text/plain", "ok");
 }
 
 void handleNotFound()
 {
 
   String message = "File Not Found\n\n";
-  message += "URI: ";
-  message += server.uri();
-  message += "\nMethod: ";
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
-  message += "\nArguments: ";
-  message += server.args();
-  message += "\n";
-  for (uint8_t i = 0; i < server.args(); i++)
-  {
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-  }
+  
   server.send(404, "text/plain", message);
 }
 
@@ -264,7 +355,9 @@ void leSensorMovimento()
       sensorMovimento = true;
       ascendeLedByColor(COR_VERMELHA);
     }
-  }else{
+  }
+  else
+  {
 
     sensorMovimento = false;
     ascendeLedByColor(COR_LARANJA);
@@ -287,17 +380,20 @@ void setup()
   WiFi.disconnect(true);
   startWifiAP();
 
-  server.on("/wifi", handlePageConfigWifi);
+  server.on("/wifi", HTTP_GET, handlePageConfigWifi);
   server.on("/home", HTTP_GET, handlePageHome);
+  server.on("/monitor", HTTP_GET, handlePageMonitor);
+
   server.on("/config/wifi", HTTP_POST, handleConnectWifi);
   server.on("/status/wifi/state", HTTP_GET, handleStatusConnectWifi);
   server.on("/state/movimento", HTTP_GET, handleStateMovimento);
 
+  server.on("/send/email", HTTP_POST, handleSendEmail);
+  server.on("/send/notyfi", HTTP_POST, handleSendNotyfi);
+
   server.onNotFound(handleNotFound);
   server.begin();
   pixels.begin();
-
-  ascendeLedByColor(COR_AMARELA);
 }
 
 void loop()
