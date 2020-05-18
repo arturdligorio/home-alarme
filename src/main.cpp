@@ -171,6 +171,12 @@ void handlePageHome()
   server.send(200, "text/html", s);
 }
 
+void handleStatus()
+{
+  String s = "on"
+  server.send(200, "text/html", s);
+}
+
 void handlePageConfigWifi()
 {
 
@@ -289,6 +295,8 @@ void setup()
 
   server.on("/wifi", handlePageConfigWifi);
   server.on("/home", HTTP_GET, handlePageHome);
+  server.on("/event", HTTP_GET, handlePageEvent);
+  server.on("/status", HTTP_GET, handleStatus)
   server.on("/config/wifi", HTTP_POST, handleConnectWifi);
   server.on("/status/wifi/state", HTTP_GET, handleStatusConnectWifi);
   server.on("/state/movimento", HTTP_GET, handleStateMovimento);
