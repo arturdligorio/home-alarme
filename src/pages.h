@@ -351,6 +351,11 @@ const char MOVIMENTO_MONITORING_PAGE[] = R"=====(
             padding: 0;
         }
         
+        body {
+            background-color: snow;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
         button {
             background-color: #158e15b3;
             height: 35px;
@@ -391,7 +396,7 @@ const char MOVIMENTO_MONITORING_PAGE[] = R"=====(
         .header {
             flex: 0 0 100%;
             font-weight: 600;
-            font-size: 30px;
+            font-size: 25px;
             font-style: italic;
         }
         
@@ -442,6 +447,38 @@ const char MOVIMENTO_MONITORING_PAGE[] = R"=====(
             ;
         }
         
+        .navbar {
+            margin-top: 30px;
+        }
+        
+        .button-home {
+            background-color: #158e15b3;
+            color: #fff;
+            width: 150px;
+            text-align: center;
+            padding: 6px 6px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .6s;
+            box-shadow: 0px 1px 5px 3px green;
+        }
+        
+        .wrapper {
+            height: 160px;
+            background-color: #fff;
+            width: 450px;
+            padding: 30px 30px;
+            padding-top: 60px;
+            box-shadow: 0px 1px 6px 3px gray;
+            border-radius: 13px;
+        }
+        
+        .button-home:hover {
+            transform: scale(1.05);
+            transition: .6s;
+        }
+        
         .transition {
             animation: opacityTransition 1.5s;
         }
@@ -460,83 +497,20 @@ const char MOVIMENTO_MONITORING_PAGE[] = R"=====(
             border-radius: 10px;
         }
     </style>
-    <script>
-        function formatDate(d) {
-
-            var day = new String(d.getDate());
-            var month = new String(d.getMonth() + 1);
-            var hours = new String(d.getHours());
-            var minutes = new String(d.getMinutes());
-            var seconds = new String(d.getSeconds());
-
-            if (day.length == 1)
-                day = "0" + day;
-
-            if (month.length == 1)
-                month = "0" + month;
-
-            if (hours.length == 1)
-                hours = "0" + hours;
-
-            if (minutes.length == 1)
-                minutes = "0" + minutes;
-
-            if (seconds.length == 1)
-                seconds = "0" + seconds;
-
-            dformat = [month,
-                day,
-                d.getFullYear()
-            ].join('/') + ' ' + [hours,
-                minutes,
-                seconds
-            ].join(':');
-            return dformat;
-        }
-
-        function sendRequest() {
-
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", "/state/movimento", false);
-            xhr.send();
-            var resp = xhr.responseText;
-
-            if (resp == "true") {
-                const list = document.getElementById('events-list');
-                const item = document.createElement('li');
-                item.appendChild(document.createTextNode(`Evento: Movimento detectado - ${formatDate(new Date())}`));
-                list.appendChild(item);
-            }
-        }
-
-        function alternateTextOpacity() {
-            let apply = true;
-            return function() {
-                console.log("applying " + apply);
-                const sendingRequestText = document.getElementById('sending-request');
-                if (apply) {
-                    sendingRequestText.classList.add('transition');
-                } else {
-                    sendingRequestText.classList.remove('transition');
-                }
-                apply = !apply;
-            }
-        }
-        const alternateText = alternateTextOpacity();
-        setInterval(() => {
-            alternateText();
-        }, 1000);
-        setInterval(() => {
-            sendRequest();
-        }, 1200);
-    </script>
 </head>
 
 <body>
     <section>
         <div class="container-all">
-            <div class="header flex">
-                <h3>Monitor de Eventos</h3>
+            <div class="wrapper">
+                <div class="header flex">
+                    <h3>Monitor de Eventos</h3>
+                </div>
+                <div class="navbar flex">
+                    <div class="button-home" id="go-home">
+                        Home
+                    </div>
+                </div>
             </div>
             <div class="sending-request flex" id="sending-request">
                 <p>Coletando informações de eventos ...</p>
@@ -548,12 +522,210 @@ const char MOVIMENTO_MONITORING_PAGE[] = R"=====(
         </div>
     </section>
 </body>
+<script>
+    function addListenerGoHome() {
+        const button = document.getElementById('go-home');
+        button.addEventListener('click', () => {
+            window.location = '/home'
+        })
+    };
+
+    function formatDate(d) {
+
+        var day = new String(d.getDate());
+        var month = new String(d.getMonth() + 1);
+        var hours = new String(d.getHours());
+        var minutes = new String(d.getMinutes());
+        var seconds = new String(d.getSeconds());
+
+        if (day.length == 1)
+            day = "0" + day;
+
+        if (month.length == 1)
+            month = "0" + month;
+
+        if (hours.length == 1)
+            hours = "0" + hours;
+
+        if (minutes.length == 1)
+            minutes = "0" + minutes;
+
+        if (seconds.length == 1)
+            seconds = "0" + seconds;
+
+        dformat = [month,
+            day,
+            d.getFullYear()
+        ].join('/') + ' ' + [hours,
+            minutes,
+            seconds
+        ].join(':');
+        return dformat;
+    }
+
+    function sendRequest() {
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/state/movimento", false);
+        xhr.send();
+        var resp = xhr.responseText;
+
+        if (resp == "true") {
+            const list = document.getElementById('events-list');
+            const item = document.createElement('li');
+            item.appendChild(document.createTextNode(`Evento: Movimento detectado - ${formatDate(new Date())}`));
+            list.appendChild(item);
+        }
+    }
+
+    function alternateTextOpacity() {
+        let apply = true;
+        return function() {
+            console.log("applying " + apply);
+            const sendingRequestText = document.getElementById('sending-request');
+            if (apply) {
+                sendingRequestText.classList.add('transition');
+            } else {
+                sendingRequestText.classList.remove('transition');
+            }
+            apply = !apply;
+        }
+    }
+    addListenerGoHome();
+    const alternateText = alternateTextOpacity();
+    setInterval(() => {
+        alternateText();
+    }, 1000);
+    setInterval(() => {
+        sendRequest();
+    }, 1200);
+</script>
 
 </html>
 )=====";
 
 const char HOME_PAGE[] = R"=====(
 
-<h1>HOME PAGE</h1>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <style>
+        * {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: ghostwhite
+        }
+        
+        .btn {
+            border-radius: 8px;
+            font-size: 1.3em;
+            line-height: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+            width: auto;
+            height: auto;
+            display: block;
+            padding: 10px 20px;
+            margin: 0 auto;
+            margin-top: 20px;
+            color: #fff;
+            border: 0;
+        }
+        
+        .on-off {
+            background-color: red;
+        }
+        
+        .page {
+            background-color: grey;
+        }
+        
+        .button-container {
+            width: 900px;
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        section {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .container-all {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: center;
+            align-items: center;
+            padding: 50px 50px;
+        }
+        
+        .flex {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .header {
+            flex: 0 0 100%;
+            font-weight: 600;
+            font-size: 30px;
+            font-style: italic;
+            padding: 10px 80px;
+        }
+        
+        .titles {
+            flex: 0 0 100%;
+            font-weight: 500;
+            font-size: 18px;
+            padding: 50px 50px;
+        }
+    </style>
+    <script>
+        function turnOnAndOff() {
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", "/status");
+            xhr.send();
+            const resp = xhr.responseText;
+
+            const button = document.getElementById('submit-btn');
+
+            if (resp == "true") return button.style.background = 'green';
+            return button.style.background = 'red';
+        }
+    </script>
+</head>
+
+<body>
+    <section>
+        <div class="container-all">
+            <div class="header flex">
+                <h3>Sistema de Alerta Contra Invasão Inteligente</h3>
+            </div>
+            <div class="titles flex">
+                <p>Monitoramento e Alarma de segurança para sua moradia controlado via App!</p>
+            </div>
+
+            <div class="button-container">
+                <div class="button">
+                    <button class="btn on-off" onclick="turnOnAndOff()">On/Off</button>
+                </div>
+                <div class="monitoring">
+                    <button class="btn page" onclick="window.location.href = window.location.origin + '/events'">Monitores</button>
+                </div>
+                <div class="wifi">
+                    <button class="btn page" onclick="window.location.href = window.location.origin + '/wifi-inicial'">Wifi Config</button>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>
 
 )=====";

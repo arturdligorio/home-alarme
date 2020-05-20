@@ -350,7 +350,6 @@ void setup()
   server.on("/config/wifi", HTTP_POST, handleConnectWifi);
   server.on("/status/wifi/state", HTTP_GET, handleStatusConnectWifi);
   server.on("/state/movimento", HTTP_GET, handleStateMovimento);
-
   server.on("/send/notyfi", HTTP_POST, handleSendNotyfi);
 
   server.onNotFound(handleNotFound);
