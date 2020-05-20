@@ -45,9 +45,8 @@ SoftwareSerial mySoftwareSerial(5, 16); // RX, TX
 DFRobotDFPlayerMini myDFPlayer;
 
 ESP8266WebServer server(80);
-HTTPClient http;
 
-//WiFiClientSecure client;
+HTTPClient http;
 
 const char *ssid_c = "ESP8266 AP";
 const char *pass_c = "10203040";
@@ -116,80 +115,41 @@ void piscaLedInicio()
   delay(250);
 }
 
-String sendNotifyIFTTTReq(){
+String sendNotifyIFTTT()
+{
 
   String response = "error";
 
-  if ((WiFi.status() == WL_CONNECTED)) {
- 
-    http.begin("https://maker.ifttt.com/trigger/alarme_disparado/with/key/i0PQ4IxUb9hQPgfonA9YcXN-DcMwDdhFnJTY2tLMbKH", FINGERPRINTS_IFTTT); 
-    int httpCode = http.GET(); 
- 
-    if (httpCode > 0) {
- 
-        response = http.getString();
-        Serial.println(httpCode);
-        Serial.println(response);
+  if ((WiFi.status() == WL_CONNECTED))
+  {
 
-        return response;
-      }
- 
-    else {
-      Serial.println("Error on HTTP request");
+    String url = "https://maker.ifttt.com/trigger/";
+    url = url + TRIGGER_IFTTT;
+    url = url + "/with/key/";
+    url = url + KEY_IFTTT;
+
+    http.begin(url, FINGERPRINTS_IFTTT);
+    int httpCode = http.GET();
+
+    if (httpCode > 0)
+    {
+      response = http.getString();
+      Serial.println(httpCode);
+      Serial.println(response);
+
+      return response;
     }
- 
-    http.end(); 
+    else
+    {
+      Serial.println("Error on HTTP request");
+      delay(1000);
+      sendNotifyIFTTT();
+    }
+
+    http.end();
   }
 
   return response;
-
-}
-
-void sendNotifyIFTTT()
-{  
-  // client.setFingerprint(FINGERPRINTS_IFTTT);
-  // client.setTimeout(15000);
-
-  // int r=0;
-  // while((!client.connect(HOST_IFTTT, PORT_IFTTT)) && (r < 100)){
-  //     delay(100);
-  //     Serial.print(".");
-  //     r++;
-  // }
-
-  // if (r < 100)
-  // {
-  //   Serial.println("Conectou ao IFTTT");
-
-  //   String url = String("GET ") + "/trigger/";
-  //   url = url + TRIGGER_IFTTT;
-  //   url = url + "/with/key/";
-  //   url = url + KEY_IFTTT;
-
-  //   client.println(url);
-
-  //   unsigned long timeout = millis();
-  //   while (client.available() == 0)
-  //   {
-  //     if (millis() - timeout > 5000)
-  //     {
-  //       Serial.println(">>> Client Timeout !");
-  //       client.stop();
-  //       return;
-  //     }
-  //   } // Read all the lines of the reply from server and print them to Serial
-  //   while (client.available())
-  //   {
-  //     String line = client.readStringUntil('\r');
-  //     Serial.print(line);
-  //   }
-  //   Serial.println();
-  //   Serial.println("closing connection");
-  // }else{
-
-  //   Serial.println("Não conectado ao IFTTT!!!");
-
-  // }
 }
 
 void startWifiAP()
@@ -323,26 +283,19 @@ void handlePageMonitor()
   server.send(200, "text/html", String(MOVIMENTO_MONITORING_PAGE));
 }
 
-void handleSendNotyfi(){
+void handleSendNotyfi()
+{
 
-  String resp = sendNotifyIFTTTReq();
+  String resp = sendNotifyIFTTT();
 
   server.send(200, "text/html", resp);
-
-}
-
-void handleSendEmail()
-{
-  sendNotifyIFTTT();
-
-  server.send(200, "text/plain", "ok");
 }
 
 void handleNotFound()
 {
 
   String message = "File Not Found\n\n";
-  
+
   server.send(404, "text/plain", message);
 }
 
@@ -373,6 +326,10 @@ void leSensorMovimento()
 void setup()
 {
 
+  ESP.eraseConfig();
+  ESP.resetFreeContStack();
+
+
   pinMode(ESP12_LED, OUTPUT);
   pinMode(SENSOR_PIN, INPUT);
 
@@ -394,7 +351,6 @@ void setup()
   server.on("/status/wifi/state", HTTP_GET, handleStatusConnectWifi);
   server.on("/state/movimento", HTTP_GET, handleStateMovimento);
 
-  server.on("/send/email", HTTP_POST, handleSendEmail);
   server.on("/send/notyfi", HTTP_POST, handleSendNotyfi);
 
   server.onNotFound(handleNotFound);
