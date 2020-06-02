@@ -12,7 +12,6 @@ const char WIFI_CONNECT_PAGE[] = R"=====(
         }
         
         button {
-            background-color: #158e15b3;
             height: 35px;
             width: 15%;
             border-radius: 10px;
@@ -76,6 +75,7 @@ const char WIFI_CONNECT_PAGE[] = R"=====(
             padding: 20px;
             border-radius: 12.5px;
             background-color: #f5f5f5;
+            text-align: center;
             /* box-shadow: 0 1px 2px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.07), 0 4px 8px rgba(0,0,0,0.07), 0 8px 16px rgba(0,0,0,0.07), 0 16px 32px rgba(0,0,0,0.07), 0 32px 64px rgba(0,0,0,0.07); */
         }
         
@@ -107,19 +107,20 @@ const char WIFI_CONNECT_PAGE[] = R"=====(
         }
         
         .wifi-card .submit-btn {
+            background-color: #158e15b3;
             border-radius: 8px;
             font-size: 1.3em;
             line-height: 1.3em;
             font-weight: bold;
-            text-transform: uppercase;
-            width: auto;
+            width: 150px;
             height: auto;
-            display: block;
             padding: 10px 20px;
+            box-shadow: 0px 1px 5px 3px green;
             margin: 0 auto;
             margin-top: 20px;
+            margin-left: 13px;
             color: #fff;
-            border: 0
+            border: 0;
         }
         
         .notification-wrapper {
@@ -161,38 +162,20 @@ const char WIFI_CONNECT_PAGE[] = R"=====(
         }
         
         .go-home-btn {
-            background-color: #fdfcfc;
-            border: 0;
-            /* width: 110px; */
-            /* height: 110px; */
-            border-radius: 12.5px;
-            position: absolute;
-            height: fit-content;
-            width: fit-content;
-            padding: 10px 20px;
-            right: -150px;
-            top: 50%;
-            transform: translateY(-50%);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.07), 0 4px 8px rgba(0, 0, 0, 0.07), 0 8px 16px rgba(0, 0, 0, 0.07), 0 16px 32px rgba(0, 0, 0, 0.07), 0 32px 64px rgba(0, 0, 0, 0.07);
-        }
-        
-        .go-home-btn:hover {
-            background-color: #f3f0f0;
-        }
-        
-        .go-home-btn svg {
-            width: 30px;
-            /* height: 60px; */
-            display: block;
-            margin: 0 auto;
-        }
-        
-        .go-home-btn p {
-            font-size: 1.4em;
-            line-height: 1.4em;
-            margin-top: 10px;
+            background-color: #f62a2a;
+            border-radius: 8px;
+            font-size: 1.3em;
+            line-height: 1.3em;
             font-weight: bold;
-            color: #5f7c95;
+            width: 150px;
+            height: auto;
+            padding: 10px 20px;
+            box-shadow: 0px 1px 5px 3px #b65454;
+            margin: 0 auto;
+            margin-top: 20px;
+            margin-left: 13px;
+            color: #fff;
+            border: 0;
         }
     </style>
     <script>
@@ -316,17 +299,8 @@ const char WIFI_CONNECT_PAGE[] = R"=====(
                         <input name="pass_wifi" id="pass" type="password" placeholder="Senha" required>
                     </div>
                     <button class="submit-btn" onclick="updateWifi()">Conectar</button>
+                    <button class="go-home-btn" onclick="window.location.href = window.location.origin + '/home'">Home</button>
                 </div>
-                <button class="go-home-btn" onclick="window.location.href = window.location.origin + '/home'">
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <svg enable-background="new 0 0 512 512" version="1.1" viewBox="0 0 512 512" xml:space="preserve"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <polygon points="256 0 20.024 168.78 20.024 207.18 256 38.4 491.98 207.18 491.98 168.78"
-                            fill="#E04F5F" />
-                        <polygon points="59.528 512 59.528 212.4 256 70.912 452.47 212.4 452.47 512" fill="#5F7D95" />
-                    </svg>
-                    <p>HOME</p>
-                </button>
             </div>
             <div class="wrapper-wifi-answer">
                 <div id="resposta_wifi"></div>
@@ -605,7 +579,6 @@ const char MOVIMENTO_MONITORING_PAGE[] = R"=====(
 )=====";
 
 const char HOME_PAGE[] = R"=====(
-
 <html>
 
 <head>
@@ -633,10 +606,20 @@ const char HOME_PAGE[] = R"=====(
             margin-top: 20px;
             color: #fff;
             border: 0;
+            cursor: pointer;
         }
         
-        .on-off {
-            background-color: red;
+        .btn-on-off {
+            color: #fff;
+            width: 150px;
+            text-align: center;
+            padding: 6px 6px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .6s;
+            box-shadow: 0px 1px 5px 3px #184a07;
+            background-color: #184a07;
         }
         
         .page {
@@ -685,23 +668,60 @@ const char HOME_PAGE[] = R"=====(
             font-size: 18px;
             padding: 50px 50px;
         }
+        
+        #loading {
+            background: no-repeat center center url("data:image/gif;base64,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");
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background-size: 60px;
+            background-color: rgb(0, 0, 0, 0.5);
+            visibility: hidden;
+        }
     </style>
     <script>
-        function turnOnAndOff() {
-            let xhr = new XMLHttpRequest();
-            xhr.open("GET", "/status");
-            xhr.send();
-            const resp = xhr.responseText;
 
+        function turnOffAlarm() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/stop/alarme", false);
+            xhr.send();
+            var resp = xhr.responseText;
+
+            if (resp == "alarme not active") {
+                alert("Alarme não disparado.");
+            }else if (resp == "parou") {
+                alert("Alarme parado.");
+            }
+        }
+
+        function turnOnAndOff() {
+
+            var load = document.getElementById("loading");
+            load.style.visibility = "visible";
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/onoff", false);
+            xhr.send();
+            var resp = xhr.responseText;
+            load.style.visibility = "hidden";
             const button = document.getElementById('submit-btn');
 
-            if (resp == "true") return button.style.background = 'green';
-            return button.style.background = 'red';
+            if (resp == "on") {
+                button.style.backgroundColor = 'green';
+                button.style.boxShadow = '0px 1px 5px 3px green';
+            } else {
+
+                button.style.backgroundColor = 'red';
+                button.style.boxShadow = '0px 1px 5px 3px red';
+            }
         }
     </script>
 </head>
 
 <body>
+    <div id="loading"></div>
     <section>
         <div class="container-all">
             <div class="header flex">
@@ -713,13 +733,17 @@ const char HOME_PAGE[] = R"=====(
 
             <div class="button-container">
                 <div class="button">
-                    <button class="btn on-off" onclick="turnOnAndOff()">On/Off</button>
+                    <button id="submit-btn" class="btn btn-on-off" onclick="turnOnAndOff()">On/Off</button>
+                </div>
+                <div class="button">
+                    <button class="btn page" onclick="turnOffAlarm()">Desligar Alarme</button>
                 </div>
                 <div class="monitoring">
-                    <button class="btn page" onclick="window.location.href = window.location.origin + '/events'">Monitores</button>
+                    <button class="btn page" onclick="window.location.href = window.location.origin + '/monitor'">Monitores</button>
                 </div>
                 <div class="wifi">
-                    <button class="btn page" onclick="window.location.href = window.location.origin + '/wifi-inicial'">Wifi Config</button>
+                    <button class="btn page" onclick="window.location.href = window.location.origin + '/wifi'">Wifi
+                        Config</button>
                 </div>
             </div>
         </div>
@@ -727,5 +751,4 @@ const char HOME_PAGE[] = R"=====(
 </body>
 
 </html>
-
 )=====";
