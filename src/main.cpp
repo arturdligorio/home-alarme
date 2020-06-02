@@ -65,19 +65,11 @@ boolean sensorMovimento = false;
 int getNumberMuisicDFPlayer()
 {
   int num_dfp = 0;
-  Serial.println("[DEBUG] GET COUNT MUSICAS\n");
-
   num_dfp = myDFPlayer.readFileCounts(DFPLAYER_DEVICE_SD);
 
-  //num_dfp = 5;
-
-  Serial.print("\nNumero de musicas..: ");
+  Serial.print("[DEBUG] Quantidade de músicas: ");
   Serial.println(num_dfp);
   return num_dfp;
-}
-
-void iniciaComponentes()
-{
 }
 
 void piscaLedInterno()
@@ -116,7 +108,6 @@ void ledPercorreFita(int r, int g, int b)
     if (apaga >= 0)
       pixels.setPixelColor(apaga, pixels.Color(NO_COLOR));
 
-    //TODO: ajustar o delay para percorre na corrente
     delay(40);
   }
 
@@ -134,7 +125,6 @@ void ledPercorreFita(int r, int g, int b)
     if (apaga <= LED_COUNT)
       pixels.setPixelColor(apaga, pixels.Color(NO_COLOR));
 
-    //TODO: ajustar o delay para percorre na corrente
     delay(40);
   }
   pixels.clear();
@@ -159,12 +149,10 @@ String sendNotifyIFTTT()
     http.begin(url);
     httpCode = http.GET();
 
-    Serial.println("[DEBUG] Notificação enviada via IFTTT.");
-
     if (httpCode > 0)
     {
       response = http.getString();
-      Serial.print("[INFO] Notificação enviada: ");
+      Serial.print("[INFO] Notificação IFTTT enviada. >> ");
       Serial.print(httpCode);
       Serial.print(" : ");
       Serial.println(response);
@@ -178,7 +166,7 @@ String sendNotifyIFTTT()
     return response;
   }
 
-  Serial.println("[DEBUG] Não Conectado no WIFI.");
+  Serial.println("[DEBUG] Notificação IFTTT não enviada. >> Não Conectado no WIFI.");
 
   return response;
 }
@@ -189,11 +177,11 @@ void startWifiAP()
   digitalWrite(ESP12_LED, HIGH);
 
   WiFi.softAP(ssid_c, pass_c);
-  Serial.print("Access Point \"");
+  Serial.print("[INFO] Access Point \"");
   Serial.print(ssid_c);
-  Serial.println("\" started");
+  Serial.println("\" iniciado.");
 
-  Serial.print("IP address:\t");
+  Serial.print("[INFO] IP de acesso:\t");
   Serial.println(WiFi.softAPIP());
 
   piscaLedInterno();
@@ -220,7 +208,7 @@ void connectWiFI(String ssid, String password)
     stateConnectWifi = "conectando";
     if (timeOut >= 30)
     {
-      Serial.println("\nTimeOut para conexão WIFI.");
+      Serial.println("\n[ERROR]TimeOut para conexão WIFI.");
       timeOutNewConnectionWifi = true;
       connectedNewWifi = false;
       stateConnectWifi = "timeout";
@@ -239,8 +227,10 @@ void connectWiFI(String ssid, String password)
     piscaLedInterno();
     piscaLedInterno();
 
-    Serial.println("\nWiFi connection Successful");
-    Serial.print("The IP Address of ESP8266 Module is: ");
+    Serial.print("\n[INFO] Conexão com \"");
+    Serial.print(ssid);
+    Serial.println("\" efetuado com sucesso.");
+    Serial.print("[INFO] O IP na nova rede conectada é: ");
     Serial.println(WiFi.localIP());
   }
 }
@@ -289,7 +279,7 @@ void handleConnectWifi()
   String ssid_connect = server.arg("ssid_wifi");
   String password_connect = server.arg("pass_wifi");
 
-  Serial.println("\nSSID: " + ssid_connect + "\tPass: " + password_connect);
+  Serial.print("[INFO] Nova conexão WIFI >> SSID: " + ssid_connect + "\tPass: " + password_connect + " :");
 
   server.send(200, "text/plain", "ok");
   connectWiFI(ssid_connect, password_connect);
@@ -306,19 +296,14 @@ void handleStatusConnectWifi()
     ipString = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
   }
 
-  Serial.println("\nLocal ip: " + ipString);
-
   if (timeOutNewConnectionWifi && !connectedNewWifi && stateConnectWifi != "conectado")
   {
-
     mensagem = stateConnectWifi;
-    Serial.println(mensagem);
     server.send(200, "text/plain", mensagem);
   }
   else if (connectedNewWifi && stateConnectWifi == "conectado")
   {
     mensagem = ipString;
-    Serial.println(mensagem);
     server.send(200, "text/plain", mensagem);
   }
 }
@@ -456,8 +441,8 @@ void setup()
 
   Serial.begin(9600);
 
-  Serial.println("");
-  Serial.println("Iniciando DFplayer");
+  Serial.println("\n");
+  Serial.println("[INFO] Iniciando DFplayer");
 
   mySoftwareSerial.begin(9600);
   myDFPlayer.begin(mySoftwareSerial);
@@ -473,6 +458,8 @@ void setup()
 #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
   clock_prescale_set(clock_div_1);
 #endif
+
+  pixels.begin();
 
   ascendeLedByColor(NO_COLOR);
   ledPercorreFita(COR_ON);
@@ -497,7 +484,7 @@ void setup()
 
   server.onNotFound(handleNotFound);
   server.begin();
-  pixels.begin();
+
   time_repro_init = TEMPO_MIN_ALARME;
 }
 
