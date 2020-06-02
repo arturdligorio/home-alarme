@@ -176,59 +176,6 @@ String sendNotifyIFTTT()
 
     http.end();
     return response;
-
-    // Serial.println("[DEBUG] Conectado no Wifi e enviando.");
-    // WiFiClientSecure clienteSecure;
-
-    // clienteSecure.setFingerprint(fingerprints_ifttt);
-    // clienteSecure.setTimeout(15000);
-    // delay(1000);
-    // Serial.print("HTTPS Connecting");
-    // int count = 0;
-    // while (! clienteSecure.connect(host_ifttt, port_ifttt) && count < 30)
-    // {
-    //   delay(100);
-    //   Serial.print(".");
-    //   count ++;
-    // }
-    // Serial.println("");
-
-    // if (clienteSecure.verify(fingerprints_ifttt, host_ifttt)) {
-    //   Serial.println("certificate matches");
-    // } else {
-    //   Serial.println("certificate doesn't match");
-    // }
-    // if (count >= 30)
-    // {
-    //   Serial.println("[ERROR] Erro na conexão com o IFTTT.");
-    // }else{
-    //   Serial.println("[INFO] Conectado no IFTTT");
-    // }
-
-    // String link = "/trigger/" ;
-    // link = link + trigger_ifttt;
-    // link = link + "/with/key/";
-    // link = link + key_ifttt;
-
-    // clienteSecure.print(String("GET ") + link + " HTTP/1.1\r\n" +
-    //            "Host: " + host_ifttt + "\r\n" +
-    //            "Connection: close\r\n\r\n");
-
-    // Serial.println("[INFO] Requisição enviada.");
-
-    // while (clienteSecure.connected()) {
-    //   String line = clienteSecure.readStringUntil('\n');
-    //   if (line == "\r") {
-    //     Serial.println("headers received\n\n");
-    //     break;
-    //   }
-    // }
-
-    // String line;
-    // while(clienteSecure.available()){
-    //   line = clienteSecure.readStringUntil('\n');  //Read Line by Line
-    //   Serial.println(line); //Print response
-    // }
   }
 
   Serial.println("[DEBUG] Não Conectado no WIFI.");
