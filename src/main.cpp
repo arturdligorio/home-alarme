@@ -459,11 +459,6 @@ void setup()
   clock_prescale_set(clock_div_1);
 #endif
 
-  pixels.begin();
-
-  ascendeLedByColor(NO_COLOR);
-  ledPercorreFita(COR_ON);
-
   WiFi.mode(WIFI_AP_STA);
   WiFi.disconnect(true);
   startWifiAP();
@@ -484,6 +479,10 @@ void setup()
 
   server.onNotFound(handleNotFound);
   server.begin();
+  pixels.begin();
+
+  ascendeLedByColor(NO_COLOR);
+  ledPercorreFita(COR_ON);
 
   time_repro_init = TEMPO_MIN_ALARME;
 }
